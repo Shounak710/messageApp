@@ -1,6 +1,7 @@
 class Api::UsersController < ApplicationController
 	
 	def index
-		render json: "Hello world!"
+		i = {"user" => "Hello world!"}
+		render json: i
 	end
 end

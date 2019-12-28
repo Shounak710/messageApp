@@ -1,5 +1,5 @@
 class Api::UsersController < ApplicationController
-  skip_before_action :authenticate_request, only: %i[login register]
+  skip_before_action :authenticate_request, only: %i[login register index]
 
   def login
     authenticate params[:email], params[:password]

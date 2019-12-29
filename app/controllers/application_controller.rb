@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::API
-  prepend SimpleCommand
   before_action :authenticate_request
   attr_reader :current_user
 
@@ -8,7 +7,7 @@ class ApplicationController < ActionController::API
   private
 
   def authenticate_request
-    @current_user = AuthorizeApiRequest.call(request.headers).result
+    @current_user = AuthorizeApiRequest.new(request.headers).call
     render json: { error: 'Not Authorized' }, status: 401 unless @current_user
   end
 end

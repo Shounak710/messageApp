@@ -37,15 +37,15 @@ class Api::UsersController < ApplicationController
   private
 
   def authenticate(email, password)
-    command = AuthenticateUser.call(email, password)
+    command = AuthenticateUser.new(email, password).call
 
-    if command.success?
+    if command
       render json: {
-        access_token: command.result,
+        access_token: command,
         message: 'Login Successful'
       }
     else
-      render json: { error: command.errors }, status: :unauthorized
+      render json: { error: "Invalid credentials" }, status: :unauthorized
     end
   end
 end

@@ -14,7 +14,11 @@ class Api::UsersController < ApplicationController
     @user = User.create(user_params)
     if @user.save
       response = { message: 'User created successfully' }
-      render json: response, status: :created
+      render json: {
+        message: response,
+        access_token: AuthenticateUser.new(user_params[:email], user_params[:password]).call
+      },
+      status: :created
     else
       render json: @user.errors, status: :bad
     end

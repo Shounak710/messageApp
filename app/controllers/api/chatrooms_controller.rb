@@ -6,7 +6,7 @@ class Api::ChatroomsController < ApplicationController
     @chatrooms.each do |chatroom|
       render json: {
         chatrooms: chatroom.to_json,
-        messages: chatroom.messages.to_json
+        messages: chatroom.messages.last.to_json
       }
     end
   end

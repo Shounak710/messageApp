@@ -2,7 +2,7 @@ class Api::UsersController < ApplicationController
   skip_before_action :authenticate_request, only: %i[login register]
 
   def login
-    authenticate params[:email], params[:password]
+    authenticate params[:name], params[:password]
   end
 
 	def index
@@ -16,7 +16,7 @@ class Api::UsersController < ApplicationController
       response = { message: 'User created successfully' }
       render json: {
         message: response,
-        access_token: AuthenticateUser.new(user_params[:email], user_params[:password]).call
+        access_token: AuthenticateUser.new(user_params[:name], user_params[:password]).call
       },
       status: :created
     else
@@ -27,7 +27,6 @@ class Api::UsersController < ApplicationController
   def user_params
     params.permit(
       :name,
-      :email,
       :password
     )
   end
@@ -55,8 +54,8 @@ class Api::UsersController < ApplicationController
 
   private
 
-  def authenticate(email, password)
-    command = AuthenticateUser.new(email, password).call
+  def authenticate(name, password)
+    command = AuthenticateUser.new(name, password).call
     if command
       render json: {
         access_token: command,

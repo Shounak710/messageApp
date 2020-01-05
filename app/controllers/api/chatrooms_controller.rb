@@ -5,8 +5,8 @@ class Api::ChatroomsController < ApplicationController
     @chatrooms = @current_user.chatrooms
     @chatrooms.each do |chatroom|
       render json: {
-        chatrooms: chatroom.to_json,
-        messages: chatroom.messages.last.to_json
+        chatrooms: Chatroom.find(2),
+        messages: Chatroom.find(2).messages.last.to_json
       }
     end
   end

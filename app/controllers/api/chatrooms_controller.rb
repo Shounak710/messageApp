@@ -3,12 +3,14 @@ class Api::ChatroomsController < ApplicationController
 
   def index
     @chatrooms = @current_user.chatrooms
+    @messages = []
     @chatrooms.each do |chatroom|
-      render json: {
-        chatrooms: Chatroom.find(2),
-        messages: Chatroom.find(2).messages.last.to_json
-      }
+      @messages << chatroom.messages.last
     end
+    render json: {
+      chatrooms: @chatrooms.to_json,
+      messages: @messages.to_json
+    }
   end
 
   def show

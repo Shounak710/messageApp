@@ -38,7 +38,7 @@ class Api::UsersController < ApplicationController
       if User.where(active: 1).count>1
         @chatroom = Chatroom.new
         @user1 = User.where(active: 1).first
-        @user2 = User.where(active: 2).second
+        @user2 = User.where(active: 1).second
         @chatroom.users = [@user1, @user2]
         @user1.update(active: 2)
         @user2.update(active: 2)

@@ -1,16 +1,10 @@
 class Api::UsersController < ApplicationController
-  skip_before_action :authenticate_request, only: %i[login register index]
+  skip_before_action :authenticate_request, only: %i[login register]
 
   def login
     authenticate params[:email], params[:password]
   end
 
-  def test
-    render json: {
-          message: 'You have passed authentication and authorization test'
-        }
-  end
-	
 	def index
 		i = {"user" => "Hello world!"}
 		render json: i
@@ -34,11 +28,31 @@ class Api::UsersController < ApplicationController
     )
   end
 
+  def connect
+    @current_user.update(active: 1)
+    3.times do
+      if User.where(active: 1).count>1
+        @chatroom = Chatroom.new
+        @user1 = User.where(active: 1).first
+        @user2 = User.where(active: 2).second
+        @chatroom.users = [@user1, @user2]
+        @user1.update(active: 2)
+        @user2.update(active: 2)
+        break
+      else
+        sleep(20)
+      end
+    end
+  end
+
+  def set_current_user
+    @current_user = AuthorizeApiRequest.new(request.headers).call
+  end
+
   private
 
   def authenticate(email, password)
     command = AuthenticateUser.new(email, password).call
-
     if command
       render json: {
         access_token: command,

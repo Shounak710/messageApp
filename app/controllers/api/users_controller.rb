@@ -35,12 +35,19 @@ class Api::UsersController < ApplicationController
     @current_user.update(active: 1)
     3.times do
       if User.where(active: 1).count>1
-        @chatroom = Chatroom.new
-        @user1 = User.where(active: 1).first
-        @user2 = User.where(active: 1).second
-        @chatroom.users = [@user1, @user2]
+        @chatroom = Chatroom.create
+        @user1 = User.where(active: 1).order(:updated_at).first
+        @user2 = User.where(active: 1).order(:updated_at).second
+        ChatroomsUser.create(chatroom: @chatroom, user: @user1)
+        ChatroomsUser.create(chatroom: @chatroom, user: @user2)
         @user1.update(active: 2)
         @user2.update(active: 2)
+        if @user1 == @current_user or @user2 == @current_user
+          render json: {
+            chatroom_id: @chatroom.id,
+            message: "Chatroom created"
+          }
+        end
         break
       else
         sleep(20)

@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  has_and_belongs_to_many :chatrooms, dependent: :destroy
+  has_and_belongs_to_many :chatrooms, dependent: :destroy, :uniq => true
   has_many :messages, dependent: :destroy
   #Validations
    validates_presence_of :name, :password_digest

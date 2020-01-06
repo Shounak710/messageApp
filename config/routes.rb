@@ -4,7 +4,7 @@ Rails.application.routes.draw do
     post 'auth/register', to: 'users#register'
     post 'auth/login', to: 'users#login'
     get 'test', to: 'users#test'
-    post 'message', to: 'messages#send_message'
+    post 'message/:id', to: 'messages#send_message'
     get 'chatroom', to: 'chatrooms#index'
     get 'chatroom/:id', to: 'chatrooms#show' 
     get 'connect', to: 'users#connect'

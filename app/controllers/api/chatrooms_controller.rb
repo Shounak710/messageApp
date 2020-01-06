@@ -4,21 +4,21 @@ class Api::ChatroomsController < ApplicationController
   def index
     @chatrooms = @current_user.chatrooms
     @chatroom = []
-    @messages = []
-    @users = []
     @chatrooms.each do |chatroom|
-      @chatroom << chatroom.id
+      c = Hash.new
+      c["chatroom_id"] = chatroom.id
       chatroom.users.each do |user|
         if user != @current_user
-          @users << user.name
+          c["username"] = user.name
         end
       end
-      @messages << chatroom.messages.last
+      c["lastmessage"] = chatroom.messages.last
+      if c.has_key? 'username'
+        @chatroom << c
+      end
     end
     render json: {
-      chatrooms: @chatroom.to_json,
-      messages: @messages.to_json,
-      users: @users.to_json
+      chatrooms: @chatroom.to_json
     }
   end
 

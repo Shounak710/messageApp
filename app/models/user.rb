@@ -6,9 +6,9 @@ class User < ApplicationRecord
   # Always use 2 spaces for indentation when programming in Ruby
 
   #Validations
-   validates_presence_of :name, :password_digest
-   validates :name, uniqueness: true
+  validates_presence_of :name, :password_digest
+  validates :name, uniqueness: true
 
-   #encrypt password
-   has_secure_password
+  #encrypt password
+  has_secure_password
 end

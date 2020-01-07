@@ -33,7 +33,7 @@ class Api::UsersController < ApplicationController
 
   def connect
     @current_user.update(active: 1)
-    3.times do
+    5.times do
       if User.where(active: 1).count>1
         @chatroom = Chatroom.create
         @user1 = User.where(active: 1).order(:updated_at).first
@@ -50,7 +50,7 @@ class Api::UsersController < ApplicationController
         end
         break
       else
-        sleep(20)
+        sleep(5)
       end
     end
   end

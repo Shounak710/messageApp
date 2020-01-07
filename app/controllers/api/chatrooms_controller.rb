@@ -25,9 +25,20 @@ class Api::ChatroomsController < ApplicationController
   def show
     @chatroom = Chatroom.find(chatroom_params[:id])
     @message = @chatroom.messages
+    @messages = []
+    @message.each do |message|
+      m = Hash.new
+      m["message"] = message.body
+      m["created_at"] = message.created_at
+      if message.sender == @current_user
+        m["sender"] = 1
+      else
+        m["sender"] = 0
+      end
+      @messages << m
+    end
     render json: {
-      messages: @message.to_json,
-      current_user: @current_user.id
+      messages: @messages.to_json,
     }
   end
 

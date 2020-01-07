@@ -3,26 +3,7 @@ class Api::ChatroomsController < ApplicationController
 
   def index
     @chatrooms = @current_user.chatrooms
-    @chatroom = []
-    # TODO: Why do you use this loop here?
-    # Can't you just return @current_user.chatrooms?
-    # Do you have a document defining your API responses?
-    @chatrooms.each do |chatroom|
-      c = Hash.new
-      c["chatroom_id"] = chatroom.id
-      chatroom.users.each do |user|
-        if user != @current_user
-          c["username"] = user.name
-        end
-      end
-      c["lastmessage"] = chatroom.messages.last
-      if c.has_key? 'username'
-        @chatroom << c
-      end
-    end
-    render json: {
-      chatrooms: @chatroom.to_json
-    }
+    Api::ChatroomSerializer.new(@chatrooms).as_json
   end
 
   def show
@@ -30,7 +11,25 @@ class Api::ChatroomsController < ApplicationController
     # the chatroom and the participants?
     # Again, do you have an API specification?
     @chatroom = Chatroom.find(params[:id])
-    @message = @chatroom.messages
-    render json: {messages: @message.to_json}
+    @messages = @chatroom.messages
+    @users = @chatroom.users
+    render json: {
+      messages: @messages.to_json,
+      users: @users.to_json
+    }
+  end
+
+  def send_message
+    # TODO: What happens if the Chatroom can not be found?
+    @chatroom = Chatroom.find(params[:id])
+    @message = Message.new(body: params[:body], chatroom: @chatroom, sender: @current_user)
+    # TODO: When using #create, the object will automatically be saved, so no need to
+    # call save here again. Either user 'if Message.create' directly, or initialize
+    # the object with Message.new, then call #save
+    if @message.save
+      response = { message: 'Message sent' }
+      # TODO: What status does this return?
+      render json: response, status: :ok
+    end
   end
 end

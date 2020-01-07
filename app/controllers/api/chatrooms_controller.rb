@@ -3,33 +3,62 @@ class Api::ChatroomsController < ApplicationController
 
   def index
     @chatrooms = @current_user.chatrooms
-    Api::ChatroomSerializer.new(@chatrooms).as_json
+    @chatroom = []
+    @chatrooms.each do |chatroom|
+      c = Hash.new
+      c["chatroom_id"] = chatroom.id
+      chatroom.users.each do |user|
+        if user != @current_user
+          c["username"] = user.name
+        end
+      end
+      c["lastmessage"] = chatroom.messages.last
+      if c.has_key? 'username'
+        @chatroom << c
+      end
+    end
+    render json: {
+      chatrooms: @chatroom.to_json
+    }
   end
 
   def show
-    # TODO: Do you really only return the messages? Shouldn't you also return
-    # the chatroom and the participants?
-    # Again, do you have an API specification?
-    @chatroom = Chatroom.find(params[:id])
-    @messages = @chatroom.messages
-    @users = @chatroom.users
+    @chatroom = Chatroom.find(chatroom_params[:id])
+    @message = @chatroom.messages
+    @messages = []
+    @message.each do |message|
+      m = Hash.new
+      m["message"] = message.body
+      m["created_at"] = message.created_at
+      if message.sender == @current_user
+        m["sender"] = 1
+      else
+        m["sender"] = 0
+      end
+      @messages << m
+    end
     render json: {
       messages: @messages.to_json,
-      users: @users.to_json
     }
   end
 
   def send_message
     # TODO: What happens if the Chatroom can not be found?
-    @chatroom = Chatroom.find(params[:id])
-    @message = Message.new(body: params[:body], chatroom: @chatroom, sender: @current_user)
+    @chatroom = Chatroom.find(chatroom_params[:id])
+    @message = Message.create(body: params[:body], chatroom: @chatroom, sender: @current_user)
     # TODO: When using #create, the object will automatically be saved, so no need to
     # call save here again. Either user 'if Message.create' directly, or initialize
     # the object with Message.new, then call #save
     if @message.save
       response = { message: 'Message sent' }
       # TODO: What status does this return?
-      render json: response, status: :ok
+      render json: response
     end
+  end
+
+  private
+
+  def chatroom_params
+    params.permit(:id)
   end
 end

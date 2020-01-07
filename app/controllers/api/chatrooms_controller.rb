@@ -4,6 +4,9 @@ class Api::ChatroomsController < ApplicationController
   def index
     @chatrooms = @current_user.chatrooms
     @chatroom = []
+    # TODO: Why do you use this loop here?
+    # Can't you just return @current_user.chatrooms?
+    # Do you have a document defining your API responses?
     @chatrooms.each do |chatroom|
       c = Hash.new
       c["chatroom_id"] = chatroom.id
@@ -23,6 +26,9 @@ class Api::ChatroomsController < ApplicationController
   end
 
   def show
+    # TODO: Do you really only return the messages? Shouldn't you also return
+    # the chatroom and the participants?
+    # Again, do you have an API specification?
     @chatroom = Chatroom.find(params[:id])
     @message = @chatroom.messages
     render json: {messages: @message.to_json}

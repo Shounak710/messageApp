@@ -1,5 +1,4 @@
 class AuthorizeApiRequest
-
   def initialize(headers = {})
     @headers = headers
   end
@@ -10,6 +9,7 @@ class AuthorizeApiRequest
 
   private
 
+  # TODO: Why do you define an attr_reader here?
   attr_reader :headers
 
   def user

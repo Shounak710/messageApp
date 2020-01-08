@@ -19,7 +19,7 @@ class Api::UsersController < ApplicationController
       @chatroom = @current_user.chatrooms.order("created_at desc").first
       @user = @chatroom.users.where.not(id: @current_user.id)[0]
       render json: {
-        chatroom: @chatroom.id,
+        chatroom: "#{@chatroom.id}",
         user: @user.name
       }
     else

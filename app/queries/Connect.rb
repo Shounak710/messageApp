@@ -1,5 +1,18 @@
 class Connect
-  def self.chat
+  def initialize(user1, user2)
+    @user1 = user1
+    @user2 = user2
+  end
+
+  def chat
+    @chatroom = Chatroom.create
+    [@user1, @user2].each do |user|
+      ChatroomsUser.create(user: user, chatroom: @chatroom)
+      user.update(active: 2)
+    end
+  end
+end
+=begin    
     @user = User.where(active: 1).order(:updated_at)
     if @user.count > 1
       @user.each_slice(2) do |user1, user2|
@@ -9,7 +22,7 @@ class Connect
       end
     end
   end
-end
+=end
 =begin
           @user1 = user1
           @user2 = user2

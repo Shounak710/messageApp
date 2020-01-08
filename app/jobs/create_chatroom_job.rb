@@ -5,15 +5,10 @@ class CreateChatroomJob < ApplicationJob
     @user1 = user1
     @user2 = user2
     @chatroom = Chatroom.create
-    ChatroomsUser.create(chatroom: @chatroom, user: @user1)
-    ChatroomsUser.create(chatroom: @chatroom, user: @user2)
-    @user1.update(active: 2)
-    @user2.update(active: 2)
-    if @user1 == @current_user or @user2 == @current_user
-      render json: { 
-        chatroom: @chatroom.id,
-        message: "You are now connected to a chatroom" 
-      }
+    [@user1, @user2].each do |user|
+      ChatroomsUser.create(user: user, chatroom: @chatroom)
+      user.update(active: 2)
     end
+    render json: { Chatroom: @chatroom.id }
   end
 end

@@ -49,7 +49,6 @@ class Api::ChatroomsController < ApplicationController
     response = { message: 'Message sent' }
     # TODO: What status does this return?
     render json: response
-    end
   end
 
   private

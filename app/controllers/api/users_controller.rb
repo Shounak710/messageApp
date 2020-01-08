@@ -58,8 +58,4 @@ class Api::UsersController < ApplicationController
       render json: { error: "Invalid credentials" }, status: :unauthorized
     end
   end
-
-  def conjo(user)
-    user.name
-  end
 end

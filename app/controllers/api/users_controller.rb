@@ -32,6 +32,7 @@ class Api::UsersController < ApplicationController
     if User.where(active: 1).count > 1
       @user1 = User.where(active: 1).order(:updated_at).first
       Connect.new(@user1, @current_user).chat
+      render status: :ok
     else
       render json: { message: "Requesting for a user" }
     end

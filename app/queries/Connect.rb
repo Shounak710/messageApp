@@ -1,5 +1,5 @@
 class Connect
-  def self.chat
+  def chat
     @user = User.where(active: 1).order(:updated_at)
     if @user.count > 1
       @user.each_slice(2) do |user1, user2|

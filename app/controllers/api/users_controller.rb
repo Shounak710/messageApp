@@ -42,7 +42,8 @@ class Api::UsersController < ApplicationController
   end
 =end
     @current_user.update(active: 1)
-    Connect.chat
+    Connect.new.delay.chat
+    render json: { message: "Requesting for a user" }
   end
   
   private

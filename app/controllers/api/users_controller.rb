@@ -17,7 +17,11 @@ class Api::UsersController < ApplicationController
   def chatroom
     if @current_user.active == 2
       @chatroom = @current_user.chatrooms.order("created_at desc").first
-      render json: {chatroom: @chatroom.id}
+      @user = @chatroom.users.where.not(id: @current_user.id)[0]
+      render json: {
+        chatroom: @chatroom.id,
+        user: @user.name
+      }
     else
       render json: {message: "Searching for a user"}
     end

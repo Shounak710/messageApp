@@ -1,5 +1,5 @@
 class Api::ChatroomSerializer < ActiveModel::Serializer
-  has_many :messages
+=begin  has_many :messages
   has_and_belongs_to_many :users
   attributes :id, :last_message
 
@@ -9,4 +9,5 @@ class Api::ChatroomSerializer < ActiveModel::Serializer
       created_at: self.messages.last.created_at
     }
   end
+=end
 end

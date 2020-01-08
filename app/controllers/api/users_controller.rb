@@ -53,7 +53,7 @@ class Api::UsersController < ApplicationController
       render json: {
         access_token: authenticator.token,
         message: message
-      }, status: :created
+      }, status: :ok
     else
       render json: { error: "Invalid credentials" }, status: :unauthorized
     end

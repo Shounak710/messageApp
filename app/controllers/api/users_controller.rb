@@ -2,43 +2,20 @@ class Api::UsersController < ApplicationController
   skip_before_action :authenticate_request, only: %i[login register]
 
   def login
-    # TODO: Don't use user params directly, always sanitize user input!
-    # Here: use user_params instead of params
-    authenticate params[:name], params[:password]
+    authenticate(user_params[:name], user_params[:password])
   end
-
-	def index
-    # TODO: I guess this is a placeholder for now, right?
-		i = {"user" => "Hello world!"}
-		render json: i
-	end
 
   def register
     @user = User.create(user_params)
     if @user.save
-      response = { message: 'User created successfully' }
-      render json: {
-        message: response,
-        # TODO: What happens, if the AuthenticateUser call fails?
-        access_token: AuthenticateUser.new(user_params[:name], user_params[:password]).call
-      },
-      status: :created
+      authenticate(user_params[:name], user_params[:password], 'User created successfully')
     else
       render json: @user.errors, status: :bad
     end
   end
 
-  # TODO: This method should be private
-  def user_params
-    params.permit(
-      :name,
-      :password
-    )
-  end
-
-  # TODO: Make a plan on how to connect users first, then implement accordingly.
-  # Discuss with Naveen
   def connect
+=begin
     @current_user.update(active: 1)
     # TODO: Never do this kind of loop in a controller!
     5.times do
@@ -63,37 +40,34 @@ class Api::UsersController < ApplicationController
       end
     end
   end
-
-  # TODO: This method should be private
-  # Also, why don't you use authenticate_request of ApplicationController instead?
-  # That method also sets the current_user
-  def set_current_user
-    # TODO: What hapens if the request can not be authorized?
-    @current_user = AuthorizeApiRequest.new(request.headers).call
+=end
+    @current_user.update(active: 1)
+    Connect.chat
   end
-
+  
   private
 
-  def authenticate(name, password)
-    # TODO: command is a very strange variable name here, why did you choose that?
-    # Could you choose a better variable name?
-    command = AuthenticateUser.new(name, password).call
-    # It would probably be better to return true or false on the authentication call,
-    # and then store the token within the AuthenticateUser class.
-    # Then you could do this like
-    # authenticator = AuthenticateUser.new(name, password)
-    # if authenticator.call
-    #   render authenticator.token
-    # else
-    #   render json: { error: "Invalid credentials" }, status: :unauthorized
-    # end
-    if command
+  def user_params
+    params.permit(
+      :name,
+      :password
+    )
+  end
+
+  def authenticate(name, password, message = nil)
+    message ||= 'Login Successful'
+    authenticator = AuthenticateUser.new(name, password)
+    if authenticator.call
       render json: {
-        access_token: command,
-        message: 'Login Successful'
-      }
+        access_token: authenticator.token,
+        message: message
+      }, status: :ok
     else
       render json: { error: "Invalid credentials" }, status: :unauthorized
     end
+  end
+
+  def conjo(user)
+    user.name
   end
 end

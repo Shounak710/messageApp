@@ -15,6 +15,7 @@ class Api::UsersController < ApplicationController
   end
 
   def connect
+=begin
     @current_user.update(active: 1)
     # TODO: Never do this kind of loop in a controller!
     5.times do
@@ -39,7 +40,11 @@ class Api::UsersController < ApplicationController
       end
     end
   end
-
+=end
+    @current_user.update(active: 1)
+    Connect.chat
+  end
+  
   private
 
   def user_params
@@ -60,5 +65,9 @@ class Api::UsersController < ApplicationController
     else
       render json: { error: "Invalid credentials" }, status: :unauthorized
     end
+  end
+
+  def conjo(user)
+    user.name
   end
 end

@@ -9,5 +9,6 @@ class CreateChatroomJob < ApplicationJob
       ChatroomsUser.create(user: user, chatroom: @chatroom)
       user.update(active: 2)
     end
+    render json: { Chatroom: @chatroom.id }
   end
 end

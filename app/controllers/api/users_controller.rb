@@ -14,36 +14,23 @@ class Api::UsersController < ApplicationController
     end
   end
 
-  def connect
-=begin
-    @current_user.update(active: 1)
-    # TODO: Never do this kind of loop in a controller!
-    5.times do
-      if User.where(active: 1).count>1
-        @chatroom = Chatroom.create
-        @user1 = User.where(active: 1).order(:updated_at).first
-        @user2 = User.where(active: 1).order(:updated_at).second
-        ChatroomsUser.create(chatroom: @chatroom, user: @user1)
-        ChatroomsUser.create(chatroom: @chatroom, user: @user2)
-        @user1.update(active: 2)
-        @user2.update(active: 2)
-        if @user1 == @current_user or @user2 == @current_user
-          render json: {
-            chatroom_id: @chatroom.id,
-            message: "Chatroom created"
-          }
-        end
-        break
-      else
-        # TODO: Never use sleep() within a controller!
-        sleep(5)
-      end
+  def chatroom
+    if @current_user.active == 2
+      @chatroom = @current_user.chatrooms.order("created_at desc").first
+      render json: {chatroom: @chatroom.id}
+    else
+      render json: {message: "Searching for a user"}
     end
   end
-=end
+
+  def connect
     @current_user.update(active: 1)
-    Connect.new.delay.chat
-    render json: { message: "Requesting for a user" }
+    if User.where(active: 1).count > 1
+      @user1 = User.where(active: 1).order(:updated_at).first
+      Connect.new(@user1, @current_user).chat
+    else
+      render json: { message: "Requesting for a user" }
+    end
   end
   
   private
@@ -62,7 +49,7 @@ class Api::UsersController < ApplicationController
       render json: {
         access_token: authenticator.token,
         message: message
-      }, status: :ok
+      }, status: :created
     else
       render json: { error: "Invalid credentials" }, status: :unauthorized
     end

@@ -51,6 +51,19 @@ class Api::ChatroomsController < ApplicationController
     render json: response
   end
 
+  def get_connect
+    if @current_user.connected?
+      @chatroom = @current_user.chatrooms.order("created_at desc").first
+      @other = @chatroom.users.where.not(id: @current_user.id).first
+      render json: {
+        chatroom: "#{@chatroom.id}",
+        user: @other.name
+      }
+    else
+      render json: {message: "Searching for a user"}
+    end
+  end
+  
   private
 
   def chatroom_params

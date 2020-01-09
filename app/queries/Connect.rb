@@ -5,10 +5,17 @@ class Connect
   end
 
   def chat
-    @chatroom = Chatroom.create
-    [@user1, @user2].each do |user|
-      ChatroomsUser.create(user: user, chatroom: @chatroom)
-      user.update(active: 2)
+    id = @user1.chatrooms.ids & @user2.chatrooms.ids
+    if id.any?
+      @user1.connected!
+      @user2.connected!
+    else
+      @chatroom = Chatroom.new
+      [@user1, @user2].each do |user|
+        @chatroom.users << user
+        user.connected!
+      end
+      @chatroom.save
     end
   end
 end
@@ -22,8 +29,6 @@ end
       end
     end
   end
-=end
-=begin
           @user1 = user1
           @user2 = user2
           @chatroom = Chatroom.create

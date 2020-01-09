@@ -2,6 +2,7 @@ class User < ApplicationRecord
   has_and_belongs_to_many :chatrooms, dependent: :destroy
   has_many :messages, dependent: :destroy
 
+  enum connection_status: [:inactive, :pending, :connected]
   # TODO: The following lines are strangely indented.
   # Always use 2 spaces for indentation when programming in Ruby
 

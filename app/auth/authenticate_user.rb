@@ -11,19 +11,21 @@ class AuthenticateUser
 	# Then add a method #token to get the access_token
 	# (You can also use an attr_reader here and set the token on successful auth)
 	def call
-		if user
-      @token = JsonWebToken.encode(user_id: user.id)
+		if auth_user
+      @token = JsonWebToken.encode(user_id: @user.id)
+    else
+      @user.errors.add :user_authentication, 'Invalid credentials'
     end
 	end
 
 	private
 
-	def user
-		user = User.find_by_name(@name)
-    if user && user.authenticate(@password)
-      return user
+  def auth_user
+    @user = User.find_by_name(@name)
+    if @user && @user.authenticate(@password)
+      return true
     else
-      user.errors.add :user_authentication, 'Invalid credentials'
+      return false
     end
   end
 end

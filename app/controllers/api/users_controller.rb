@@ -14,24 +14,12 @@ class Api::UsersController < ApplicationController
     end
   end
 
-  def chatroom
-    if @current_user.active == 2
-      @chatroom = @current_user.chatrooms.order("created_at desc").first
-      @user = @chatroom.users.where.not(id: @current_user.id)[0]
-      render json: {
-        chatroom: "#{@chatroom.id}",
-        user: @user.name
-      }
-    else
-      render json: {message: "Searching for a user"}
-    end
-  end
-
   def connect
-    @current_user.update(active: 1)
-    if User.where(active: 1).count > 1
-      @user1 = User.where(active: 1).order(:updated_at).first
-      Connect.new(@user1, @current_user).chat
+    @current_user.pending!
+    if User.where(connection_status: :pending).count > 1
+      @other = User.where(connection_status: :pending).where.not(id: @current_user.id).first
+      Connect.new(@other, @current_user).chat
+      render status: :ok
     else
       render json: { message: "Requesting for a user" }
     end
@@ -55,7 +43,7 @@ class Api::UsersController < ApplicationController
         message: message
       }, status: :ok
     else
-      render json: { error: "Invalid credentials" }, status: :unauthorized
+      render json: { error: 'Invalid credentials' }, status: :unauthorized
     end
   end
 end

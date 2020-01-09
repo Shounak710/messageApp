@@ -14,7 +14,7 @@ class AuthenticateUser
 		if auth_user
       @token = JsonWebToken.encode(user_id: @user.id)
     else
-      @user.errors.add :user_authentication, 'Invalid credentials'
+      errors.add(:user_authentication, 'Invalid credentials')
     end
 	end
 

@@ -2,13 +2,19 @@ class Api::UsersController < ApplicationController
   skip_before_action :authenticate_request, only: %i[login register]
 
   def login
-    authenticate(user_params[:name], user_params[:password])
+    if authenticate(user_params[:name], user_params[:password])
+      render json: {
+        access_token: @token
+      }, status: :ok
+    end
   end
 
   def register
     @user = User.create(user_params)
-    if @user.save
-      authenticate(user_params[:name], user_params[:password], 'User created successfully')
+    if authenticate(user_params[:name], user_params[:password])
+      render json: {
+        access_token: @token
+      }, status: :ok
     else
       render json: @user.errors, status: :bad
     end
@@ -34,16 +40,13 @@ class Api::UsersController < ApplicationController
     )
   end
 
-  def authenticate(name, password, message = nil)
-    message ||= 'Login Successful'
+  def authenticate(name, password)
     authenticator = AuthenticateUser.new(name, password)
     if authenticator.call
-      render json: {
-        access_token: authenticator.token,
-        message: message
-      }, status: :ok
+      @token = authenticator.token
+      return true
     else
-      render json: { error: 'Invalid credentials' }, status: :unauthorized
+      render json: { error: authenticator.errors }, status: :unauthorized
     end
   end
 end

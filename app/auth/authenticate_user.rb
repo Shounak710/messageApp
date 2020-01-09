@@ -24,7 +24,6 @@ class AuthenticateUser
       return user
     else
       user.errors.add :user_authentication, 'Invalid credentials'
-      nil
     end
   end
 end

@@ -48,10 +48,10 @@ class Api::UsersController < ApplicationController
   private
 
   def user_params
-    params.permit(
-      :name,
-      :password
-    )
+    params.require(:user).permit(
+                              :name,
+                              :password
+                            )
   end
 
   def authenticate(name, password, message = nil)

@@ -8,13 +8,14 @@ class Api::ChatroomsController < ApplicationController
       c = Hash.new
       c["id"] = chatroom.id
       c["username"] = chatroom.users.where.not(id: @current_user.id).first.name
-      c["last_message"] = { 
-        id: chatroom.messages.last.id,
-        body: chatroom.messages.last.body,
-        sender: chatroom.messages.last.sender == @current_user ? 'self' : 'other',
-        created_at: chatroom.messages.last.created_at
-      }
-       unless chatroom.messages.count == 0
+      c["last_message"] = [
+        { 
+          id: chatroom.messages.last.id,
+          body: chatroom.messages.last.body,
+          sender: chatroom.messages.last.sender == @current_user ? 'self' : 'other',
+          created_at: chatroom.messages.last.created_at
+        }
+      ] unless chatroom.messages.count == 0
       if c.has_key? 'username'
         @chatrooms << c
       end

@@ -7,10 +7,17 @@ class Api::UsersController < ApplicationController
 
   def register
     @user = User.create(user_params)
-    if @user.save
-      authenticate(user_params[:name], user_params[:password], 'User created successfully')
+    if @user.valid?
+      authenticate(user_params[:name], user_params[:password])
+      render json: {
+        access_token: @token
+      }, status: :created
     else
-      render json: @user.errors, status: :bad
+      if @user.errors[:name].any? and @user.errors[:password].any?
+        render json: {errors: @user.errors}, status: :bad_request
+      else
+        render json: {errors: @user.errors}, status: :unprocessable_entity
+      end
     end
   end
 

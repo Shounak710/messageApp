@@ -68,7 +68,7 @@ class Api::UsersController < ApplicationController
 
   def user_params
     # require user here on master branch
-    params.permit(
+    params.require(:user).permit(
       :name,
       :password
     )

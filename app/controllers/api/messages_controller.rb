@@ -23,6 +23,6 @@ class Api::MessagesController < ApplicationController
   private
 
   def message_params
-    params.permit(:body)
+    params.require(:message).permit(:body)
   end
 end

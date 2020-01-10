@@ -3,12 +3,26 @@ class Api::MessagesController < ApplicationController
 
   def send_message
     # TODO: What happens if the Chatroom can not be found?
-    @chatroom = Chatroom.find(chatroom_params[:id])
-    @message = Message.create(body: params[:body], chatroom: @chatroom, sender: @current_user)
-    response = { message: 'Message sent' }
+    @chatroom = Chatroom.find(params[:id])
+    @message = Message.new(body: message_params[:body], chatroom: @chatroom, sender: @current_user)
     # TODO: What status does this return?
-    render json: response
+    if @message.save
+      render json: {
+        message: {
+          id: @message.id,
+          body: @message.body,
+          sender: @current_user.name,
+          created_at: @message.created_at
+        }
+      }, status: :ok
+    else
+      render json: { errors: @message.errors }, status: :unprocessable_entity
+    end
   end
 
-  
+  private
+
+  def message_params
+    params.require(:message).permit(:body)
+  end
 end

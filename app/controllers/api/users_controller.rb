@@ -45,11 +45,24 @@ class Api::UsersController < ApplicationController
     if User.where(connection_status: :pending).count > 1
       @other = User.where(connection_status: :pending).where.not(id: @current_user.id).first
       ConnectService.new(@current_user, @other).chat
-      render json: {connection: "pending"}, status: :created
-    else
-      render json: {connection: "pending"}, status: :ok
     end
+    render json: {
+      connection: { 
+        status: "pending"
+      }
+    }, status: :ok
   end
+
+  def disconnect
+    @current_user.inactive!
+    @current_user.update(active_chatroom: 0)
+    render json: {
+      connection: {
+        status: "inactive"
+      }
+    }, status: :ok
+  end  
+
   
   private
 

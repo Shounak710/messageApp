@@ -5,12 +5,12 @@ class ConnectService
   end
 
   def chat
-    @chatroom = Chatroom.new
+    @chatroom = Chatroom.create
     [@user, @other].each do |user|
       @chatroom.users << user
       user.connected!
+      user.update(active_chatroom: @chatroom.id)
     end
-    @chatroom.save
   end
 end          
       

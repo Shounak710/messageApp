@@ -6,17 +6,24 @@ class Api::UsersController < ApplicationController
       render json: {
         access_token: @token
       }, status: :ok
+    else
+      render json: @user.errors, status: :bad
     end
   end
 
   def register
     @user = User.create(user_params)
-    if authenticate(user_params[:name], user_params[:password])
+    if @user.valid?
+      authenticate(user_params[:name], user_params[:password])
       render json: {
         access_token: @token
-      }, status: :ok
+      }, status: :created
     else
-      render json: @user.errors, status: :bad
+      if @user.errors[:name].any? and @user.errors[:password].any?
+        render json: {errors: @user.errors}, status: :bad_request
+      else
+        render json: {errors: @user.errors}, status: :unprocessable_entity
+      end
     end
   end
 
@@ -24,10 +31,10 @@ class Api::UsersController < ApplicationController
     @current_user.pending!
     if User.where(connection_status: :pending).count > 1
       @other = User.where(connection_status: :pending).where.not(id: @current_user.id).first
-      Connect.new(@other, @current_user).chat
-      render status: :ok
+      ConnectService.new(@current_user, @other).chat
+      render status: :created
     else
-      render json: { message: "Requesting for a user" }
+      render status: :ok
     end
   end
   
@@ -46,7 +53,7 @@ class Api::UsersController < ApplicationController
       @token = authenticator.token
       return true
     else
-      render json: { error: authenticator.errors }, status: :unauthorized
+      return false
     end
   end
 end

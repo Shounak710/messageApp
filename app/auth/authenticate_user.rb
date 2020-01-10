@@ -13,8 +13,9 @@ class AuthenticateUser
 	def call
 		if auth_user
       @token = JsonWebToken.encode(user_id: @user.id)
+      return true
     else
-      errors.add(:user_authentication, 'Invalid credentials')
+      return false
     end
 	end
 
@@ -22,10 +23,7 @@ class AuthenticateUser
 
   def auth_user
     @user = User.find_by_name(@name)
-    if @user && @user.authenticate(@password)
-      return true
-    else
-      return false
-    end
+    return false unless @user
+    return @user.authenticate(@password)
   end
 end

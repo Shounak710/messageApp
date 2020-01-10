@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     get 'connect', to: 'chatrooms#get_connect'
     post 'connect', to: 'users#connect'
     get 'test', to: 'users#test'
-    post 'chatroom/:id', to: 'chatrooms#send_message'
+    post 'chatroom/:id', to: 'messages#send_message'
     get 'chatrooms', to: 'chatrooms#index'
     get 'chatroom/:id', to: 'chatrooms#show' 
   end

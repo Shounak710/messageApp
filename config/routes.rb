@@ -3,10 +3,10 @@ Rails.application.routes.draw do
     resources :users
     post 'auth/register', to: 'users#register'
     post 'auth/login', to: 'users#login'
-    get 'connect', to: 'users#chatroom'
+    get 'connect', to: 'chatrooms#get_connect'
     post 'connect', to: 'users#connect'
     get 'test', to: 'users#test'
-    post 'chatroom/:id', to: 'chatrooms#send_message'
+    post 'chatroom/:id', to: 'messages#send_message'
     get 'chatrooms', to: 'chatrooms#index'
     get 'chatroom/:id', to: 'chatrooms#show' 
   end

@@ -42,15 +42,19 @@ class Api::ChatroomsController < ApplicationController
     }
   end
 
-  def send_message
-    # TODO: What happens if the Chatroom can not be found?
-    @chatroom = Chatroom.find(chatroom_params[:id])
-    @message = Message.create(body: params[:body], chatroom: @chatroom, sender: @current_user)
-    response = { message: 'Message sent' }
-    # TODO: What status does this return?
-    render json: response
+  def get_connect
+    if @current_user.connected?
+      @chatroom = @current_user.chatrooms.order("created_at desc").first
+      @other = @chatroom.users.where.not(id: @current_user.id).first
+      render json: {
+        chatroom: "#{@chatroom.id}",
+        user: @other.name
+      }
+    else
+      render json: {message: "Searching for a user"}
+    end
   end
-
+  
   private
 
   def chatroom_params

@@ -2,65 +2,62 @@ class Api::UsersController < ApplicationController
   skip_before_action :authenticate_request, only: %i[login register]
 
   def login
-    authenticate(user_params[:name], user_params[:password])
-  end
-
-  def register
-    @user = User.create(user_params)
-    if @user.valid?
-      authenticate(user_params[:name], user_params[:password])
-      render json: {
-        access_token: @token
-      }, status: :created
+    if authenticator.invalid?
+      render json: authenticator.errors, status: :unprocessable_entity 
     else
-      if @user.errors[:name].any? and @user.errors[:password].any?
-        render json: {errors: @user.errors}, status: :bad_request
+      if authenticator.authenticated
+        user = User.find_by_name(user_params[:name])
+        render json: {
+          id: user.id,
+          name: user.name,
+          access_token: authenticator.token
+        }, status: :ok
       else
-        render json: {errors: @user.errors}, status: :unprocessable_entity
+        head :forbidden
       end
     end
   end
 
-  def chatroom
-    if @current_user.active == 2
-      @chatroom = @current_user.chatrooms.order("created_at desc").first
-      @user = @chatroom.users.where.not(id: @current_user.id)[0]
+  def register
+    @user = User.new(user_params)
+    if @user.save
+      authenticator.authenticated
       render json: {
-        chatroom: "#{@chatroom.id}",
-        user: @user.name
-      }
+        id: @user.id,
+        name: @user.name,
+        access_token: authenticator.token
+      }, status: :created
     else
-      render json: {message: "Searching for a user"}
+      if authenticator.invalid?
+        render json: { errors: authenticator.errors }, status: :unprocessable_entity
+      else
+        render json: { errors: @user.errors }, status: :conflict
+      end
     end
   end
 
   def connect
-    @current_user.update(active: 1)
-    if User.where(active: 1).count > 1
-      @user1 = User.where(active: 1).order(:updated_at).first
-      Connect.new(@user1, @current_user).chat
-      render status: :ok
+    @current_user.pending!
+    if User.where(connection_status: :pending).count > 1
+      @other = User.where(connection_status: :pending).where.not(id: @current_user.id).first
+      ConnectService.new(@current_user, @other).chat
+      render json: {connection: "pending"}, status: :created
     else
-      render json: { message: "Requesting for a user" }
+      render status: :ok
     end
   end
   
   private
 
   def user_params
-    params.require(:user).permit(
-                              :name,
-                              :password
-                            )
+    # require user here on master branch
+    params.permit(
+      :name,
+      :password
+    )
   end
 
-  def authenticate(name, password)
-    authenticator = AuthenticateUser.new(name, password)
-    if authenticator.call
-      @token = authenticator.token
-      return true
-    else
-      return false
-    end
+  def authenticator
+    @authenticator ||= AuthenticateUser.new(user_params[:name], user_params[:password])
   end
 end

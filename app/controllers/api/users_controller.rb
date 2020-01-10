@@ -6,11 +6,13 @@ class Api::UsersController < ApplicationController
       render json: authenticator.errors, status: :unprocessable_entity 
     else
       if authenticator.authenticated
-        user = User.find_by_name(user_params[:name])
+        user = authenticator.user
         render json: {
-          id: user.id,
-          name: user.name,
-          access_token: authenticator.token
+          user: {
+            id: user.id,
+            name: user.name,
+            access_token: authenticator.token
+          }
         }, status: :ok
       else
         head :forbidden
@@ -23,9 +25,11 @@ class Api::UsersController < ApplicationController
     if @user.save
       authenticator.authenticated
       render json: {
-        id: @user.id,
-        name: @user.name,
-        access_token: authenticator.token
+        user: {
+          id: @user.id,
+          name: @user.name,
+          access_token: authenticator.token
+        }
       }, status: :created
     else
       if authenticator.invalid?
@@ -43,7 +47,7 @@ class Api::UsersController < ApplicationController
       ConnectService.new(@current_user, @other).chat
       render json: {connection: "pending"}, status: :created
     else
-      render status: :ok
+      render json: {connection: "pending"}, status: :ok
     end
   end
   
@@ -51,7 +55,7 @@ class Api::UsersController < ApplicationController
 
   def user_params
     # require user here on master branch
-    params.require(:user).permit(
+    params.permit(
       :name,
       :password
     )

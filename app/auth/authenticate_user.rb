@@ -9,7 +9,7 @@ class AuthenticateUser
   end
 
   def authenticated
-    if user
+    if get_user
       @token = JsonWebToken.encode(user_id: @user.id)
       return true
     else
@@ -27,7 +27,7 @@ class AuthenticateUser
 
   private
 
-  def user
+  def get_user
     @user = User.find_by_name(@name)
     return false unless @user
     return @user.authenticate(@password)

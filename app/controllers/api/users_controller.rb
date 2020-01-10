@@ -54,16 +54,13 @@ class Api::UsersController < ApplicationController
                             )
   end
 
-  def authenticate(name, password, message = nil)
-    message ||= 'Login Successful'
+  def authenticate(name, password)
     authenticator = AuthenticateUser.new(name, password)
     if authenticator.call
-      render json: {
-        access_token: authenticator.token,
-        message: message
-      }, status: :ok
+      @token = authenticator.token
+      return true
     else
-      render json: { error: "Invalid credentials" }, status: :unauthorized
+      return false
     end
   end
 end

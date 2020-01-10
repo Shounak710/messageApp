@@ -1,17 +1,15 @@
 class AuthenticateUser
-  attr_reader :token
+  include ActiveModel::Validations
+  validate :params_present
+  attr_reader :token, :user
 
 	def initialize(name, password)
 		@name = name
 		@password = password
 	end
 
-	# TODO: This method should better return true if user can be authenticated,
-	# false else.
-	# Then add a method #token to get the access_token
-	# (You can also use an attr_reader here and set the token on successful auth)
-	def call
-		if auth_user
+	def authenticated
+		if user
       @token = JsonWebToken.encode(user_id: @user.id)
       return true
     else
@@ -19,9 +17,17 @@ class AuthenticateUser
     end
 	end
 
+  def params_present
+    if @name.blank?
+      errors.add(:name, "Must exist")
+    elsif @password.blank?
+      errors.add(:password, "Must exist")
+    end
+  end
+
 	private
 
-  def auth_user
+  def user
     @user = User.find_by_name(@name)
     return false unless @user
     return @user.authenticate(@password)

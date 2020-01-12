@@ -2,10 +2,8 @@ class Api::MessagesController < ApplicationController
   before_action :authenticate_request
 
   def send_message
-    # TODO: What happens if the Chatroom can not be found?
     @chatroom = Chatroom.find(params[:id])
     @message = Message.new(body: message_params[:body], chatroom: @chatroom, sender: @current_user)
-    # TODO: What status does this return?
     if @message.save
       render json: {
         message: {

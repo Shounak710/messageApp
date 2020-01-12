@@ -11,7 +11,6 @@ class AuthorizeApiRequest
 
   def user
     @user ||= User.find(decoded_auth_token[:user_id]) if decoded_auth_token
-    @user || errors.add(:token, 'Invalid token')
   end
 
   def decoded_auth_token
@@ -21,7 +20,6 @@ class AuthorizeApiRequest
   def http_auth_header
     if @headers['Authorization'].present?
       return @headers['Authorization'].split(' ').last
-    else errors.add(:token, 'Missing token')
     end
   end
 end

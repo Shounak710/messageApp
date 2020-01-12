@@ -14,7 +14,7 @@ module ExceptionHandler
     rescue_from ExceptionHandler::AuthenticationError, with: :unauthorized_request
     rescue_from ExceptionHandler::MissingToken, with: :four_twenty_two
     rescue_from ExceptionHandler::InvalidToken, with: :four_twenty_two
-    rescue_from ExceptionHandler::ExpiredSignature, with: :four_ninety_eight
+    rescue_from ExceptionHandler::ExpiredSignature, with: :four_zero_three
     rescue_from ExceptionHandler::DecodeError, with: :four_zero_one
 
     rescue_from ActiveRecord::RecordNotFound do |e|
@@ -34,8 +34,8 @@ module ExceptionHandler
   end
  
 # JSON response with message; Status code 401 - Unauthorized
-  def four_ninety_eight(e)
-    render json: { message: e.message }, status: :invalid_token
+  def four_zero_three
+    render status: :forbidden
   end
 
   # JSON response with message; Status code 401 - Unauthorized

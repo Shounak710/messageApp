@@ -1,6 +1,6 @@
 class Api::ChatroomsController < ApplicationController
   before_action :authenticate_request
-  before_action :validate_user, only: [:show, :all_messages]
+  before_action :validate_user_in_chatroom, only: [:show, :all_messages]
 
   def index
     render json: @current_user.chatrooms, root: 'chatrooms', each_serializer: AllChatroomSerializer, adapter: :json

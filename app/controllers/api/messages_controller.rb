@@ -1,5 +1,5 @@
 class Api::MessagesController < ApplicationController
-  before_action :authenticate_request, :validate_user
+  before_action :authenticate_request, :validate_user_in_chatroom
 
   def send_message
     @message = Message.new(body: message_params[:body], chatroom: @chatroom, sender: @current_user)

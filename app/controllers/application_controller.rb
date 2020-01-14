@@ -15,7 +15,7 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def validate_user
+  def validate_user_in_chatroom
     @chatroom = Chatroom.find(chatroom_params[:id])
     unless @chatroom.users.include? @current_user
       render status: :forbidden

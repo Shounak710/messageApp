@@ -8,11 +8,19 @@ class JsonWebToken
       payload[:exp] = exp.to_i
       
        # this encodes the user data(payload) with our secret key
+       #In production:
+       #  JWT.encode(payload, ENV['SECRET_KEY_BASE'])
+       #In development:
+       #  JWT.encode(payload, Rails.application.secrets.secret_key_base) 
       JWT.encode(payload, Rails.application.secrets.secret_key_base)
     end
 
     def decode(token)
       #decodes the token to get user data (payload)
+      #In production:
+       #  JWT.decode(token, ENV['SECRET_KEY_BASE'])[0]
+       #In development:
+       #  JWT.decode(token, Rails.application.secrets.secret_key_base)[0]
       body = JWT.decode(token, Rails.application.secrets.secret_key_base)[0]
       HashWithIndifferentAccess.new body
 

@@ -1,8 +1,8 @@
 class AllChatroomSerializer < ActiveModel::Serializer
-  attributes :id, :user
+  attributes :id, :other_user
   attribute :last_message, if: :messages_exist?
 
-  def user
+  def other_user
     {
       name: self.object.users.where.not(id: current_user.id).first.name
     }

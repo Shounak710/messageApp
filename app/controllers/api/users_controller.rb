@@ -54,7 +54,7 @@ class Api::UsersController < ApplicationController
 
   def disconnect
     @current_user.inactive!
-    @current_user.update(active_chatroom: :null)
+    @current_user.update(active_chatroom: nil)
     render json: {
       connection: {
         status: "#{@current_user.connection_status}"

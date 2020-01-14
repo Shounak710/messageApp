@@ -23,14 +23,17 @@ class Api::UsersController < ApplicationController
   def register
     @user = User.new(user_params)
     if @user.save
-      authenticator.authenticated
-      render json: {
-        user: {
-          id: @user.id,
-          name: @user.name,
-          access_token: authenticator.token
-        }
-      }, status: :created
+      if authenticator.authenticated
+        render json: {
+          user: {
+            id: @user.id,
+            name: @user.name,
+            access_token: authenticator.token
+          }
+        }, status: :created
+      else
+        render json: {errors: authenticator.errors}, status: :unprocessable_entity
+      end
     else
       render json: {errors: @user.errors}, status: :unprocessable_entity
     end
@@ -51,10 +54,10 @@ class Api::UsersController < ApplicationController
 
   def disconnect
     @current_user.inactive!
-    @current_user.update(active_chatroom: 0)
+    @current_user.update(active_chatroom: :null)
     render json: {
       connection: {
-        status: "inactive"
+        status: "#{@current_user.connection_status}"
       }
     }, status: :ok
   end  

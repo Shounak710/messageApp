@@ -14,4 +14,11 @@ class ApplicationController < ActionController::API
       render status: :unauthorized
     end
   end
+
+  def validate_user
+    @chatroom = Chatroom.find(chatroom_params[:id])
+    unless @chatroom.users.include? @current_user
+      render status: :forbidden
+    end
+  end
 end

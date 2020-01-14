@@ -25,12 +25,5 @@ class Api::MessagesController < ApplicationController
 
   def message_params
     params.require(:message).permit(:body)
-  end
-
-  def validate_user
-    @chatroom = Chatroom.find(chatroom_params[:id])
-    unless @chatroom.users.include? @current_user
-      render status: :forbidden
-    end
   end 
 end

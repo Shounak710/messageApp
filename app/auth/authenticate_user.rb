@@ -17,6 +17,8 @@ class AuthenticateUser
     end
   end
 
+  private
+
   def params_present
     if @name.blank?
       errors.add(:name, "Must exist")
@@ -24,8 +26,6 @@ class AuthenticateUser
       errors.add(:password, "Must exist")
     end
   end
-
-  private
 
   def get_user
     @user = User.find_by_name(@name)

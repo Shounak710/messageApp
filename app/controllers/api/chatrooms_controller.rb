@@ -3,8 +3,7 @@ class Api::ChatroomsController < ApplicationController
   before_action :validate_user, only: [:show, :all_messages]
 
   def index
-    @chatroom = @current_user.chatrooms
-    render json: @chatroom, root: 'chatrooms', each_serializer: AllChatroomSerializer, adapter: :json
+    render json: @current_user.chatrooms, root: 'chatrooms', each_serializer: AllChatroomSerializer, adapter: :json
   end
 
   def all_messages
@@ -12,14 +11,13 @@ class Api::ChatroomsController < ApplicationController
   end
 
   def show
-    @messages = @chatroom.messages
-    render json: @messages, root: 'messages', each_serializer: ChatroomMessagesSerializer, adapter: :json
+    render json: @chatroom.messages, root: 'messages', each_serializer: ChatroomMessagesSerializer, adapter: :json
   end
 
   def get_connect
     if @current_user.connected?
       @chatroom = Chatroom.find(@current_user.active_chatroom)
-      @other = @chatroom.users.where.not(id: @current_user.id).first
+      @other = @chatroom.partner_of(@current_user)
       render json: {
         connection: {
           status: "connected",
@@ -30,7 +28,7 @@ class Api::ChatroomsController < ApplicationController
     else
       render json: {
         connection: {
-          status: "pending",
+          status: "#{@current_user.connection_status}",
         }
       }, status: :ok
     end
@@ -40,12 +38,5 @@ class Api::ChatroomsController < ApplicationController
 
   def chatroom_params
     params.permit(:id)
-  end
-
-  def validate_user
-    @chatroom = Chatroom.find(chatroom_params[:id])
-    unless @chatroom.users.include? @current_user
-      render status: :forbidden
-    end
   end
 end

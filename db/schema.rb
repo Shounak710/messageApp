@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_11_135945) do
+ActiveRecord::Schema.define(version: 2020_01_14_075550) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,8 +41,8 @@ ActiveRecord::Schema.define(version: 2020_01_11_135945) do
     t.string "password_digest"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "connection_status", default: 0
-    t.integer "active_chatroom", default: 0
+    t.integer "connection_status", default: 0, null: false
+    t.integer "active_chatroom"
     t.index ["name"], name: "index_users_on_name", unique: true
   end
 

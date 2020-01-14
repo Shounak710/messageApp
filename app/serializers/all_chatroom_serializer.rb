@@ -4,7 +4,7 @@ class AllChatroomSerializer < ActiveModel::Serializer
 
   def other_user
     {
-      name: self.object.users.where.not(id: current_user.id).first.name
+      name: self.object.partner_of(current_user).name
     }
   end
 
@@ -12,12 +12,12 @@ class AllChatroomSerializer < ActiveModel::Serializer
     {
       id: self.object.messages.last.id,
       body: self.object.messages.last.body,
-      sender: self.object.messages.last.sender == current_user ? 'self' : 'other',
+      sender: self.object.messages.last.sent_by?(current_user),
       created_at: self.object.messages.last.created_at
     }
   end
 
   def messages_exist?
-    true if self.object.messages.any?
+    self.object.messages.any?
   end
 end

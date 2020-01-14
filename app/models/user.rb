@@ -3,8 +3,6 @@ class User < ApplicationRecord
   has_many :messages, dependent: :destroy
 
   enum connection_status: [:inactive, :pending, :connected]
-  # TODO: The following lines are strangely indented.
-  # Always use 2 spaces for indentation when programming in Ruby
 
   #Validations
   validates_presence_of :name, :password_digest

@@ -1,5 +1,6 @@
 class Api::ChatroomsController < ApplicationController
   before_action :authenticate_request
+  before_action :validate_user, only: [:show, :all_messages]
 
   def index
     @chatroom = @current_user.chatrooms
@@ -7,12 +8,10 @@ class Api::ChatroomsController < ApplicationController
   end
 
   def all_messages
-    @chatroom = Chatroom.find(chatroom_params[:id])
     render json: @chatroom, root: 'chatroom', serializer: ChatroomOverviewSerializer, adapter: :json
   end
 
   def show
-    @chatroom = Chatroom.find(chatroom_params[:id])
     @messages = @chatroom.messages
     render json: @messages, root: 'messages', each_serializer: ChatroomMessagesSerializer, adapter: :json
   end
@@ -41,5 +40,12 @@ class Api::ChatroomsController < ApplicationController
 
   def chatroom_params
     params.permit(:id)
+  end
+
+  def validate_user
+    @chatroom = Chatroom.find(chatroom_params[:id])
+    unless @chatroom.users.include? @current_user
+      render status: :forbidden
+    end
   end
 end

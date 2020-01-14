@@ -24,7 +24,7 @@ class Api::ChatroomsController < ApplicationController
         connection: {
           status: "connected",
           chatroom: "#{@chatroom.id}",
-          user: @other.name
+          other_name: @other.name
         }
       }, status: :ok
     else

@@ -3,7 +3,7 @@ class Api::UsersController < ApplicationController
 
   def login
     if authenticator.invalid?
-      render json: authenticator.errors, status: :unprocessable_entity 
+      render json: {errors: authenticator.errors}, status: :unprocessable_entity 
     else
       if authenticator.authenticated
         user = authenticator.user
@@ -32,11 +32,7 @@ class Api::UsersController < ApplicationController
         }
       }, status: :created
     else
-      if authenticator.invalid?
-        render json: { errors: authenticator.errors }, status: :unprocessable_entity
-      else
-        render json: { errors: @user.errors }, status: :conflict
-      end
+      render json: {errors: @user.errors}, status: :unprocessable_entity
     end
   end
 

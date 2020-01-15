@@ -20,4 +20,3 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
-/lib/json_web_token.rb

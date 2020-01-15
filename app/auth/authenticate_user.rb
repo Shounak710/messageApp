@@ -1,29 +1,35 @@
 class AuthenticateUser
-	# TODO: Why do you define attr_accessors here?
-	attr_accessor :name, :password
+  include ActiveModel::Validations
+  validate :params_present
+  attr_reader :token, :user
 
-	def initialize(name, password)
-		@name = name
-		@password = password
-	end
+  def initialize(name, password)
+    @name = name
+    @password = password
+  end
 
-	# TODO: This method should better return true if user can be authenticated,
-	# false else.
-	# Then add a method #token to get the access_token
-	# (You can also use an attr_reader here and set the token on successful auth)
-	def call
-		JsonWebToken.encode(user_id: user.id) if user
-	end
-
-	private
-
-	def user
-		user = User.find_by_name(name)
-    if user && user.authenticate(password)
-      return user
+  def authenticated
+    if get_user
+      @token = JsonWebToken.encode(user_id: @user.id)
+      return true
     else
-      user.errors.add :user_authentication, 'Invalid credentials'
-      nil
+      return false
     end
+  end
+
+  private
+
+  def params_present
+    if @name.blank?
+      errors.add(:name, "Must exist")
+    elsif @password.blank?
+      errors.add(:password, "Must exist")
+    end
+  end
+
+  def get_user
+    @user = User.find_by_name(@name)
+    return false unless @user
+    return @user.authenticate(@password)
   end
 end

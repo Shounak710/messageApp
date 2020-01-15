@@ -1,36 +1,42 @@
 class Api::ChatroomsController < ApplicationController
   before_action :authenticate_request
+  before_action :validate_user_in_chatroom, only: [:show, :all_messages]
 
   def index
-    @chatrooms = @current_user.chatrooms
-    @chatroom = []
-    # TODO: Why do you use this loop here?
-    # Can't you just return @current_user.chatrooms?
-    # Do you have a document defining your API responses?
-    @chatrooms.each do |chatroom|
-      c = Hash.new
-      c["chatroom_id"] = chatroom.id
-      chatroom.users.each do |user|
-        if user != @current_user
-          c["username"] = user.name
-        end
-      end
-      c["lastmessage"] = chatroom.messages.last
-      if c.has_key? 'username'
-        @chatroom << c
-      end
-    end
-    render json: {
-      chatrooms: @chatroom.to_json
-    }
+    render json: @current_user.chatrooms, root: 'chatrooms', each_serializer: AllChatroomSerializer, adapter: :json
+  end
+
+  def all_messages
+    render json: @chatroom, root: 'chatroom', serializer: ChatroomOverviewSerializer, adapter: :json
   end
 
   def show
-    # TODO: Do you really only return the messages? Shouldn't you also return
-    # the chatroom and the participants?
-    # Again, do you have an API specification?
-    @chatroom = Chatroom.find(params[:id])
-    @message = @chatroom.messages
-    render json: {messages: @message.to_json}
+    render json: @chatroom.messages, root: 'messages', each_serializer: ChatroomMessagesSerializer, adapter: :json
+  end
+
+  def get_connect
+    if @current_user.connected?
+      @chatroom = Chatroom.find(@current_user.active_chatroom)
+      @other = @chatroom.partner_of(@current_user)
+      render json: {
+        connection: {
+          status: "connected",
+          chatroom: "#{@chatroom.id}",
+          other_name: @other.name
+        }
+      }, status: :ok
+    else
+      render json: {
+        connection: {
+          status: "#{@current_user.connection_status}",
+        }
+      }, status: :ok
+    end
+  end
+  
+  private
+
+  def chatroom_params
+    params.permit(:id)
   end
 end

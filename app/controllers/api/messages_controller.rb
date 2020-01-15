@@ -1,17 +1,29 @@
 class Api::MessagesController < ApplicationController
-  before_action :authenticate_request
+  before_action :authenticate_request, :validate_user_in_chatroom
 
   def send_message
-    # TODO: What happens if the Chatroom can not be found?
-    @chatroom = Chatroom.find(params[:id])
-    @message = Message.create(body: params[:body], chatroom: @chatroom, sender: @current_user)
-    # TODO: When using #create, the object will automatically be saved, so no need to
-    # call save here again. Either user 'if Message.create' directly, or initialize
-    # the object with Message.new, then call #save
+    @message = Message.new(body: message_params[:body], chatroom: @chatroom, sender: @current_user)
     if @message.save
-      response = { message: 'Message sent' }
-      # TODO: What status does this return?
-      render json: response
+      render json: {
+        message: {
+          id: @message.id,
+          body: @message.body,
+          sender: @current_user.name,
+          created_at: @message.created_at
+        }
+      }, status: :ok
+    else
+      render json: { errors: @message.errors }, status: :unprocessable_entity
     end
   end
+
+  private
+
+  def chatroom_params
+    params.permit(:id)
+  end
+
+  def message_params
+    params.require(:message).permit(:body)
+  end 
 end

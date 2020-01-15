@@ -1,6 +1,5 @@
 class ApplicationController < ActionController::API
   before_action :authenticate_request
-  # TODO: Why do you include an attr_reader here?
   attr_reader :current_user
 
   include ExceptionHandler
@@ -8,7 +7,15 @@ class ApplicationController < ActionController::API
   private
 
   def authenticate_request
-    @current_user = AuthorizeApiRequest.new(request.headers).call
-    render json: { error: 'Not Authorized' }, status: 401 unless @current_user
+    if request.headers['Authorization'].present?
+      @current_user = AuthorizeApiRequest.new(request.headers).call
+      render status: :forbidden unless @current_user
+    else
+      render status: :unauthorized
+    end
+  end
+
+  def validate_user_in_chatroom
+    @chatroom = @current_user.chatrooms.find(chatroom_params[:id])
   end
 end
